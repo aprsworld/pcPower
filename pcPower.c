@@ -5,9 +5,6 @@ typedef struct {
 	int8 modbus_address;
 	int8 modbus_mode;
 
-	int8 rs485_port_mode;
-	int8 rs485_port_speed;
-
 	int8 serial_prefix;
 	int16 serial_number;
 
@@ -25,19 +22,16 @@ typedef struct {
 	int16 power_on_above_adc;
 	int16 power_on_above_delay;
 	int16 power_override_timeout;
-
-	/* sentences we make available via modbus */
-	int8 nmea0183_sentence[N_NMEA0183_SENTENCES][6];
 } struct_config;
 
 
 
 typedef struct {
 	/* most recent valid */
-	int16 adc_std_dev[8];
+	int16 adc_std_dev[1];
 
 	/* circular buffer for ADC readings */
-	int16 adc_buffer[8][16];
+	int16 adc_buffer[1][16];
 	int8  adc_buffer_index;
 
 	int16 modbus_our_packets;
@@ -75,11 +69,9 @@ typedef struct {
 
 	int1 now_millisecond;
 
-	int8 port_b;
-	int8 port_c;
 
 	/* transmit buffer for PIC to PI */
-	int8 rda_tx_buff[256];
+	int8 rda_tx_buff[64];
 	int8 rda_tx_length;
 	int8 rda_tx_pos;
 	int1 now_rda_tx_ready;
@@ -144,14 +136,15 @@ void periodic_millisecond(void) {
 	static int16 adcTicks=0;
 	static int16 ticks=0;
 	/* button debouncing */
-	static int16 b0_state=0; /* push button */
-	static int16 b1_state=0; /* magnet switch */
+//	static int16 b0_state=0; /* push button */
+//	static int16 b1_state=0; /* magnet switch */
 	/* power control */
-	int8 i;
+//	int8 i;
 
 
 	timers.now_millisecond=0;
 
+#if 0
 	/* button must be down for 12 milliseconds */
 	b0_state=(b0_state<<1) | !bit_test(timers.port_b,BUTTON_BIT) | 0xe000;
 	if ( b0_state==0xf000) {
@@ -160,6 +153,7 @@ void periodic_millisecond(void) {
 	} else {
 		current.button_State=0;
 	}
+#endif
 
 	/* green LED control */
 	if ( 0==timers.led_on_green ) {
@@ -232,11 +226,20 @@ void periodic_millisecond(void) {
 
 
 void main(void) {
-	int8 i;
+	int8 i,j;
 
 	i=restart_cause();
 
 	init();
+
+	output_high(PI_POWER_EN);
+
+	for ( j=0 ; j<100 ; j++ ) {
+		output_high(PIC_LED_GREEN);
+		delay_ms(50);
+		output_low(PIC_LED_GREEN);
+		delay_ms(50);
+	}
 
 
 #if 1
@@ -257,13 +260,13 @@ void main(void) {
 #endif
 
 
-	read_param_file();
+//	read_param_file();
 
 
 
-	if ( config.modbus_address > 128 ) {
+//	if ( config.modbus_address > 128 ) {
 		write_default_param_file();
-	}
+//	}
 
 	/* start Modbus slave */
 	setup_uart(TRUE);
@@ -284,6 +287,7 @@ void main(void) {
 	for ( ; ; ) {
 		restart_wdt();
 
+//		output_bit(PIC_LED_GREEN,input(SW_MAGNET));
 
 		if ( timers.now_millisecond ) {
 			periodic_millisecond();

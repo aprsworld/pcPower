@@ -290,6 +290,7 @@ void modbus_calc_crc(char data)
 // Inputs:     Character
 // Outputs:    None
 void modbus_serial_putc(int8 c) {
+	/* TODO make sure we don't overflow */
 	timers.rda_tx_buff[timers.rda_tx_length]=c;
 	timers.rda_tx_length++;
 	modbus_calc_crc(c);

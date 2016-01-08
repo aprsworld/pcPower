@@ -32,6 +32,7 @@
 #define SW_BUTTON            PIN_A3
 #define PI_POWER_EN          PIN_C4
 #define PIC_LED_GREEN        PIN_C6
+#define LED_GREEN            PIC_LED_GREEN
 #define PIC_TO_PI            PIN_C7
 #define SER_TO_PI            PIN_B7
 #define WATCHDOG_FROM_PI     PIN_B6
@@ -39,3 +40,14 @@
 #define SW_MAGNET            PIN_B4
 #define AN_IN_VOLTS          PIN_C0
 #define PI_POWER_FLAG        PIN_A2
+
+/* 
+Parameters are stored in EEPROM
+*/
+#define PARAM_CRC_ADDRESS  0x000
+#define PARAM_ADDRESS      PARAM_CRC_ADDRESS+2
+
+#define EE_FOR_HOST_ADDRESS 512
+
+#byte TXSTA=GETENV("SFR:txsta")
+#bit  TRMT=TXSTA.1

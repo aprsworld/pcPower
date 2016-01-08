@@ -29,10 +29,7 @@ void adc_update(void) {
 	if ( current.adc_buffer_index >= 16 )
 		current.adc_buffer_index=0;
 
-
-	for ( i=0 ; i<8 ; i++ ) {
-		current.adc_buffer[i][current.adc_buffer_index] = mcp3208_read(i);
-		current.adc_std_dev[i]=0;
-
-	}
+	set_adc_channel(0);
+	current.adc_buffer[i][current.adc_buffer_index] = read_adc();
+	current.adc_std_dev[i]=0;
 }

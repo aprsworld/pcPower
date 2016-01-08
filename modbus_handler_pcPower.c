@@ -19,15 +19,14 @@ void reset_modbus_stats(void) {
 }
 
 int16 map_modbus(int16 addr) {
-	static u_lblock ps;
-	int8 n,o;
-	int8 *p;
+//	static u_lblock ps;
+//	int8 n,o;
+//	int8 *p;
 
 	if ( addr >= MIN_EE_REGISTER && addr < MAX_EE_REGISTER ) {
 		return (int16) read_eeprom(addr - MIN_EE_REGISTER + EE_FOR_HOST_ADDRESS);
 	}
 
-	if ( addr >= MIN_NMEA0183_CONFIG_REGISTER && addr < MAX_NMEA0183_CONFIG_REGISTER ) {
 
 	switch ( addr ) {
 		/* analog channels */
@@ -47,7 +46,7 @@ int16 map_modbus(int16 addr) {
 		case  8: return (int16) current.watchdog_seconds; 
 
 		/* triggers a new measurement */
-		case  9: reset_counters(); return (int16) 0;
+		case  9: return (int16) 0;
 		/* modbus statistics */
 		case 10: return (int16) current.modbus_our_packets;
 		case 11: return (int16) current.modbus_other_packets;
@@ -133,7 +132,7 @@ try to write the specified register
 if successful, return 0, otherwise return a modbus exception
 */
 exception modbus_write_register(int16 address, int16 value) {
-	int8 n,o;
+//	int8 n,o;
 
 	if ( address >= MIN_EE_REGISTER && address < MAX_EE_REGISTER ) {
 		if ( value > 256 ) return ILLEGAL_DATA_VALUE;
@@ -234,8 +233,6 @@ void modbus_process(void) {
 
 	/* check for message */
 	if ( modbus_kbhit() ) {
-output_low(_PIC_TO_PI);
-//		output_high(TP_RED);
 
 		if ( 128==config.modbus_address || modbus_rx.address==config.modbus_address ) {
 			/* Modbus statistics */
