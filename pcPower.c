@@ -91,7 +91,7 @@ struct_time_keep timers;
 
 
 void init(void) {
-	setup_oscillator(OSC_8MHZ);
+	setup_oscillator(OSC_16MHZ);
 
 	port_a_pullups(0b00111111);
 	port_b_pullups(0b01011111);

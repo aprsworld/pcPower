@@ -1,7 +1,7 @@
 #include <18F14K22.h>
 #device ADC=12
 #device *=16
-#use delay(clock=8MHz)
+#use delay(clock=16MHz)
 
 #fuses INTRC_IO
 #fuses NOPLLEN
