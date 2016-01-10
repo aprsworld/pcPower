@@ -1,4 +1,7 @@
-
+#int_timer2
+void isr_timer2() {
+	timers.now_millisecond=1;
+}
 
 /* transmit buffer empty for Modbus to raspberry pi buffer */
 #int_tbe

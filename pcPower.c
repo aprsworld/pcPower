@@ -27,11 +27,8 @@ typedef struct {
 
 
 typedef struct {
-	/* most recent valid */
-	int16 adc_std_dev[1];
-
 	/* circular buffer for ADC readings */
-	int16 adc_buffer[1][16];
+	int16 adc_buffer[2][16];
 	int8  adc_buffer_index;
 
 	int16 modbus_our_packets;
@@ -71,7 +68,7 @@ typedef struct {
 
 
 	/* transmit buffer for PIC to PI */
-	int8 rda_tx_buff[64];
+	int8 rda_tx_buff[56];
 	int8 rda_tx_length;
 	int8 rda_tx_pos;
 	int1 now_rda_tx_ready;
@@ -92,6 +89,11 @@ struct_time_keep timers;
 
 void init(void) {
 	setup_oscillator(OSC_16MHZ);
+
+	setup_adc(ADC_CLOCK_DIV_16);
+	setup_adc_ports(sAN4,VSS_VDD);
+	setup_vref(VREF_1v024);
+
 
 	port_a_pullups(0b00111111);
 	port_b_pullups(0b01011111);
@@ -126,6 +128,11 @@ void init(void) {
 	current.power_off_delay=config.power_off_below_delay;
 	current.power_override_timeout=0;
 
+	/* one periodic interrupt @ 1mS. Generated from system 16 MHz clock */
+	/* prescale=16, match=249, postscale=1. Match is 249 because when match occurs, one cycle is lost */
+	setup_timer_2(T2_DIV_BY_16,249,1);
+
+	enable_interrupts(INT_TIMER2);
 
 	/* RDA - PI is turned on in modbus_slave_pcwx's init */
 }
@@ -226,21 +233,22 @@ void periodic_millisecond(void) {
 
 
 void main(void) {
-	int8 i,j;
+	int8 i;
 
 	i=restart_cause();
 
 	init();
 
-	output_high(PI_POWER_EN);
+//	output_high(PI_POWER_EN);
 
+#if 0
 	for ( j=0 ; j<100 ; j++ ) {
 		output_high(PIC_LED_GREEN);
 		delay_ms(50);
 		output_low(PIC_LED_GREEN);
 		delay_ms(50);
 	}
-
+#endif
 
 #if 1
 	fprintf(STREAM_PI,"# pcPower %s\r\n",__DATE__);
@@ -260,13 +268,15 @@ void main(void) {
 #endif
 
 
-//	read_param_file();
+	read_param_file();
 
 
 
-//	if ( config.modbus_address > 128 ) {
+	if ( config.modbus_address > 128 ) {
 		write_default_param_file();
-//	}
+	}
+
+	timers.led_on_green=500;
 
 	/* start Modbus slave */
 	setup_uart(TRUE);

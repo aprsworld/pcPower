@@ -47,7 +47,7 @@ Parameters are stored in EEPROM
 #define PARAM_CRC_ADDRESS  0x000
 #define PARAM_ADDRESS      PARAM_CRC_ADDRESS+2
 
-#define EE_FOR_HOST_ADDRESS 512
+#define EE_FOR_HOST_ADDRESS 128
 
 #byte TXSTA=GETENV("SFR:txsta")
 #bit  TRMT=TXSTA.1

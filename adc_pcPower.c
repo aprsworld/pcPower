@@ -22,14 +22,17 @@ int16 adc_get(int8 ch) {
 
 
 void adc_update(void) {
-	int8 i;
 
 	/* wrap buffer around */
 	current.adc_buffer_index++;
 	if ( current.adc_buffer_index >= 16 )
 		current.adc_buffer_index=0;
 
-	set_adc_channel(0);
-	current.adc_buffer[i][current.adc_buffer_index] = read_adc();
-	current.adc_std_dev[i]=0;
+	set_adc_channel(4);
+	current.adc_buffer[0][current.adc_buffer_index] = read_adc();
+
+	set_adc_channel(FVR_CHANNEL);
+	current.adc_buffer[1][current.adc_buffer_index] = read_adc();
+
+
 }

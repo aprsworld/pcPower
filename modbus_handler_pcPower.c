@@ -33,11 +33,13 @@ int16 map_modbus(int16 addr) {
 		/* input voltage */
 		case  0: return (int16) current.adc_buffer[0][current.adc_buffer_index];
 		case  1: return (int16) adc_get(0);
-		case  2: return (int16) current.adc_std_dev[0];
+		/* fixed 1.024 volt reference */
+		case  2: return (int16) current.adc_buffer[1][current.adc_buffer_index];
+		case  3: return (int16) adc_get(1);
+
 
 		/* switch channels */
-		case  3: return (int16) input(SW_MAGNET);
-		case  4: return (int16) input(SW_BUTTON);
+		case  4: return (int16) input(SW_MAGNET);
 		
 		/* status */
 		case  5: return (int16) current.sequence_number++;
