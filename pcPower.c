@@ -88,7 +88,7 @@ struct_time_keep timers;
 
 #include "modbus_slave_pcPower.c"
 #include "modbus_handler_pcPower.c"
-
+#include "interrupt_pcPower.c"
 
 void init(void) {
 	setup_oscillator(OSC_16MHZ);
@@ -282,7 +282,7 @@ void main(void) {
 	current.p_on=config.power_startup;
 
 
-	fprintf(STREAM_PI,"# pcPower %s\r\n",__DATE__);
+	fprintf(STREAM_PI,"# pcPower %s config.modbus_address=%u\r\n",__DATE__,config.modbus_address);
 
 	for ( ; ; ) {
 		restart_wdt();
@@ -300,7 +300,6 @@ void main(void) {
 		}
 
 		modbus_process();
-
 
 		/* buffered modbus transmit */
 
@@ -325,7 +324,6 @@ void main(void) {
 			delay_us(61); /* 57600 */
    			RCV_ON();
 		}
-
 	}
 
 

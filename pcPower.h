@@ -9,10 +9,10 @@
 #fuses NOIESO
 #fuses PUT
 #fuses BROWNOUT
-#fuses WDT32768
+#fuses WDT4096
 #fuses NOHFOFST
 #fuses NOMCLR
-#fuses NOSTVREN
+#fuses STVREN
 #fuses NOLVP
 #fuses NOXINST
 #fuses NODEBUG
