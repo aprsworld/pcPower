@@ -146,7 +146,7 @@ void periodic_millisecond(void) {
 	timers.now_millisecond=0;
 
 	/* set magnet latch. Reset by writing 0 to magnet latch register */
-	if ( input(SW_MAGNET) ) {
+	if ( ! input(SW_MAGNET) ) {
 		current.latch_sw_magnet=1;
 	}
 

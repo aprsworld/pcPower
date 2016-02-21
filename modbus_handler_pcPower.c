@@ -39,7 +39,7 @@ int16 map_modbus(int16 addr) {
 
 
 		/* switch channels */
-		case  6: return (int16) input(SW_MAGNET);
+		case  6: return (int16) ! input(SW_MAGNET);
 		case  7: return (int16) current.latch_sw_magnet;
 		
 		/* status */
