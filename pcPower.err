@@ -1,4 +1,4 @@
->>> Warning 216 "pcPower.c" Line 337(1,2): Interrupts disabled during call to prevent re-entrancy:  (modbus_calc_crc)
+>>> Warning 216 "pcPower.c" Line 338(1,2): Interrupts disabled during call to prevent re-entrancy:  (modbus_calc_crc)
       Memory usage:   ROM=37%      RAM=67% - 74%
       0 Errors,  1 Warnings.
 Build Successful.

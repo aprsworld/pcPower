@@ -121,6 +121,7 @@ void init(void) {
 	current.adc_buffer_index=0;
 	current.factory_unlocked=0;
 	current.watchdog_seconds=0;
+	current.latch_sw_magnet=0;
 
 	/* power control switch */
 	current.power_on_delay=config.power_on_above_delay;
