@@ -22,6 +22,8 @@ typedef struct {
 	int16 power_on_above_adc;
 	int16 power_on_above_delay;
 	int16 power_override_timeout;
+
+	int8 pic_to_pi_latch_mask;
 } struct_config;
 
 
@@ -53,8 +55,7 @@ typedef struct {
 	int16 rda_bytes_received;
 
 	/* push button on board */
-	int8 button_state;
-	int8 magnet_state;
+	int8 latch_sw_magnet;
 } struct_current;
 
 typedef struct {
@@ -120,8 +121,6 @@ void init(void) {
 	current.adc_buffer_index=0;
 	current.factory_unlocked=0;
 	current.watchdog_seconds=0;
-	current.button_state=0;
-	current.magnet_state=0;
 
 	/* power control switch */
 	current.power_on_delay=config.power_on_above_delay;
@@ -142,25 +141,21 @@ void periodic_millisecond(void) {
 	static int8 uptimeticks=0;
 	static int16 adcTicks=0;
 	static int16 ticks=0;
-	/* button debouncing */
-//	static int16 b0_state=0; /* push button */
-//	static int16 b1_state=0; /* magnet switch */
-	/* power control */
-//	int8 i;
 
 
 	timers.now_millisecond=0;
 
-#if 0
-	/* button must be down for 12 milliseconds */
-	b0_state=(b0_state<<1) | !bit_test(timers.port_b,BUTTON_BIT) | 0xe000;
-	if ( b0_state==0xf000) {
-		/* button pressed */
-		current.button_state=1;
-	} else {
-		current.button_State=0;
+	/* set magnet latch. Reset by writing 0 to magnet latch register */
+	if ( input(SW_MAGNET) ) {
+		current.latch_sw_magnet=1;
 	}
-#endif
+
+	/* set PIC to PI line based on latch state(s) */
+	if ( bit_test(config.pic_to_pi_latch_mask,1) && current.latch_sw_magnet ) {
+		output_high(PIC_TO_PI);
+	} else {
+		output_low(PIC_TO_PI);
+	}
 
 	/* green LED control */
 	if ( 0==timers.led_on_green ) {

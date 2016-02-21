@@ -1,7 +1,7 @@
-#define MAX_STATUS_REGISTER          54
+#define MAX_STATUS_REGISTER          33
 
 #define MIN_CONFIG_REGISTER          1000
-#define MAX_CONFIG_REGISTER          1013
+#define MAX_CONFIG_REGISTER          1012
 
 #define MIN_EE_REGISTER              2000
 #define MAX_EE_REGISTER              MIN_EE_REGISTER + 512
@@ -39,22 +39,21 @@ int16 map_modbus(int16 addr) {
 
 
 		/* switch channels */
-		case  4: return (int16) input(SW_MAGNET);
+		case 10: return (int16) input(SW_MAGNET);
+		case 11: return (int16) current.latch_sw_magnet;
 		
 		/* status */
-		case  5: return (int16) current.sequence_number++;
-		case  6: return (int16) current.interval_milliseconds; /* milliseconds since last query */
-		case  7: return (int16) current.uptime_minutes; 
-		case  8: return (int16) current.watchdog_seconds; 
+		case 20: return (int16) current.sequence_number++;
+		case 21: return (int16) current.interval_milliseconds; /* milliseconds since last query */
+		case 22: return (int16) current.uptime_minutes; 
+		case 23: return (int16) current.watchdog_seconds; 
 
-		/* triggers a new measurement */
-		case  9: return (int16) 0;
 		/* modbus statistics */
-		case 10: return (int16) current.modbus_our_packets;
-		case 11: return (int16) current.modbus_other_packets;
-		case 12: return (int16) current.modbus_last_error;
+		case 30: return (int16) current.modbus_our_packets;
+		case 31: return (int16) current.modbus_other_packets;
+		case 32: return (int16) current.modbus_last_error;
 		/* triggers a modbus statistics reset */
-		case 13: reset_modbus_stats(); return (int16) 0;
+		case 33: reset_modbus_stats(); return (int16) 0;
 
 		/* configuration */
 		case 1000: return (int16) config.serial_prefix;
@@ -62,13 +61,14 @@ int16 map_modbus(int16 addr) {
 		case 1002: return (int16) 'P';
 		case 1003: return (int16) 'C';
 		case 1004: return (int16) 'P';
-		case 1005: return (int16) 0;
+		case 1005: return (int16) 1;
 		case 1006: return (int16) config.modbus_address;
 		case 1007: return (int16) config.adc_sample_ticks;
 		case 1008: return (int16) config.allow_bootload_request;
 		case 1009: return (int16) config.watchdog_seconds_max;
 		case 1010: return (int16) config.pi_offtime_seconds;
 		case 1011: return (int16) config.power_startup;
+		case 1012: return (int16) config.pic_to_pi_latch_mask;
 
 		/* we should have range checked, and never gotten here */
 		default: return (int16) 65535;
@@ -97,6 +97,9 @@ int8 modbus_valid_read_registers(int16 start, int16 end) {
 
 int8 modbus_valid_write_registers(int16 start, int16 end) {
 	if ( 19999==start && 20000==end)
+		return 1;
+
+	if ( 12==start && 13==end)
 		return 1;
 
 	if ( start >= MIN_EE_REGISTER && end <= MAX_EE_REGISTER+1 )
@@ -157,7 +160,10 @@ exception modbus_write_register(int16 address, int16 value) {
 
 	/* publicly writeable addresses */
 	switch ( address ) {
-			
+		case 12:
+			if ( 0 != value ) return ILLEGAL_DATA_VALUE;
+			current.latch_sw_magnet=0;
+			break;
 
 		case 1006:
 			/* Modbus address {0 to 127 or 128 for respond to any} */
@@ -189,6 +195,11 @@ exception modbus_write_register(int16 address, int16 value) {
 		case 1011:
 			if ( value > 1 ) return ILLEGAL_DATA_VALUE;
 			config.power_startup=value;
+			break;
+
+		case 1012:
+			if ( value > 1 ) return ILLEGAL_DATA_VALUE;
+			config.pic_to_pi_latch_mask=value;
 			break;
 		
 
