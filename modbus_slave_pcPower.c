@@ -113,7 +113,7 @@
 #define RCV_OFF() {disable_interrupts(INT_RDA);}
 
 
-#define MODBUS_SERIAL_RX_BUFFER_SIZE  255      //size of send/rcv buffer
+#define MODBUS_SERIAL_RX_BUFFER_SIZE  127      //size of send/rcv buffer
 
 void wait_for_hw_buffer() {
   while(!TRMT);

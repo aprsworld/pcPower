@@ -1,4 +1,4 @@
-#define MAX_STATUS_REGISTER          33
+#define MAX_STATUS_REGISTER          19
 
 #define MIN_CONFIG_REGISTER          1000
 #define MAX_CONFIG_REGISTER          1012
@@ -39,21 +39,21 @@ int16 map_modbus(int16 addr) {
 
 
 		/* switch channels */
-		case 10: return (int16) input(SW_MAGNET);
-		case 11: return (int16) current.latch_sw_magnet;
+		case  6: return (int16) input(SW_MAGNET);
+		case  7: return (int16) current.latch_sw_magnet;
 		
 		/* status */
-		case 20: return (int16) current.sequence_number++;
-		case 21: return (int16) current.interval_milliseconds; /* milliseconds since last query */
-		case 22: return (int16) current.uptime_minutes; 
-		case 23: return (int16) current.watchdog_seconds; 
+		case 10: return (int16) current.sequence_number++;
+		case 11: return (int16) current.interval_milliseconds; /* milliseconds since last query */
+		case 12: return (int16) current.uptime_minutes; 
+		case 13: return (int16) current.watchdog_seconds; 
 
 		/* modbus statistics */
-		case 30: return (int16) current.modbus_our_packets;
-		case 31: return (int16) current.modbus_other_packets;
-		case 32: return (int16) current.modbus_last_error;
+		case 16: return (int16) current.modbus_our_packets;
+		case 17: return (int16) current.modbus_other_packets;
+		case 18: return (int16) current.modbus_last_error;
 		/* triggers a modbus statistics reset */
-		case 33: reset_modbus_stats(); return (int16) 0;
+		case 19: reset_modbus_stats(); return (int16) 0;
 
 		/* configuration */
 		case 1000: return (int16) config.serial_prefix;
@@ -70,7 +70,7 @@ int16 map_modbus(int16 addr) {
 		case 1011: return (int16) config.power_startup;
 		case 1012: return (int16) config.pic_to_pi_latch_mask;
 
-		/* we should have range checked, and never gotten here */
+		/* we should have range checked, and never gotten here ... or read unimplemented (future) register */
 		default: return (int16) 65535;
 	}
 
@@ -99,7 +99,7 @@ int8 modbus_valid_write_registers(int16 start, int16 end) {
 	if ( 19999==start && 20000==end)
 		return 1;
 
-	if ( 12==start && 13==end)
+	if ( 7==start && 8==end)
 		return 1;
 
 	if ( start >= MIN_EE_REGISTER && end <= MAX_EE_REGISTER+1 )
@@ -160,7 +160,7 @@ exception modbus_write_register(int16 address, int16 value) {
 
 	/* publicly writeable addresses */
 	switch ( address ) {
-		case 12:
+		case 7:
 			if ( 0 != value ) return ILLEGAL_DATA_VALUE;
 			current.latch_sw_magnet=0;
 			break;
