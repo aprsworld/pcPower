@@ -152,7 +152,7 @@ void periodic_millisecond(void) {
 	}
 
 	/* set PIC to PI line based on latch state(s) */
-	if ( bit_test(config.pic_to_pi_latch_mask,1) && current.latch_sw_magnet ) {
+	if ( bit_test(config.pic_to_pi_latch_mask,0) && current.latch_sw_magnet ) {
 		output_high(PIC_TO_PI);
 	} else {
 		output_low(PIC_TO_PI);
